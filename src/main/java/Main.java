@@ -3,10 +3,12 @@ import Commands.CustomCommands.DadBotCustomCommand;
 import Commands.LeagueCommands.ChampInfoCommand;
 import Commands.LeagueCommands.CurrentRotationCommand;
 import Commands.LeagueCommands.RandomChampCommand;
+import Commands.MusicCommands.PlayCommand;
 import Commands.SysAdminCommands.SpecsCommand;
 import Constants.Configuration;
 import InternalParser.ConfigurationLoader;
 import InternalParser.JsonLoader;
+import Music.MusicManager;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -73,13 +75,15 @@ public class Main {
         ApiConfig config = new ApiConfig().setKey(riotToken);
         RiotApi api = new RiotApi(config);
 
+        MusicManager manager = new MusicManager();
+
         //set bot configurations
         builder.setOwnerId(Configuration.kOwnerId);
         builder.setPrefix(Configuration.kBotPrefix);
         builder.setActivity(Activity.playing(Configuration.kActivityText));
         builder.useHelpBuilder(false);
 
-        builder.addCommands(new ChampInfoCommand(), new RandomChampCommand(), new CurrentRotationCommand(api), new SpecsCommand());
+        builder.addCommands(new ChampInfoCommand(), new RandomChampCommand(), new CurrentRotationCommand(api), new SpecsCommand(), new PlayCommand(manager));
 
         CommandClient client = builder.build();
 
