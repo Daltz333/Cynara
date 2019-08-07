@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -30,7 +31,12 @@ public class ConfigurationLoader {
     }
 
     public static String getCurrentDir() {
-        return System.getProperty("user.dir");
-
+        try {
+            logger.info("Using directory: " +  new File(ConfigurationLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath());
+            return new File(ConfigurationLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
+        } catch (URISyntaxException e) {
+            logger.error("Exception: ", e);
+            return "";
+        }
     }
 }

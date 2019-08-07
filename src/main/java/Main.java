@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    private static Logger logger = LoggerFactory.getLogger(Main.class);
+    private static Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
 
     private static JDA jda;
 
