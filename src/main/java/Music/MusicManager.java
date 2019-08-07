@@ -91,7 +91,6 @@ public class MusicManager {
         event.getChannel().sendMessage("Stopping Song!").queue();
         event.getGuild().getAudioManager().closeAudioConnection();
         trackScheduler.clearQueue();
-        player.destroy();
     }
 
     public void skipToTrack() {

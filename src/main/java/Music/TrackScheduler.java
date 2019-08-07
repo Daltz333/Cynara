@@ -99,6 +99,8 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void clearQueue() {
-        queue.clear();
+        for (int i = 0; i < queue.remainingCapacity(); i++) {
+            queue.remove();
+        }
     }
 }

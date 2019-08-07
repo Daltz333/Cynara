@@ -27,6 +27,8 @@ public class PlayCommand extends Command {
             return;
         }
 
+        event.getChannel().sendTyping().queue();
+
         manager.startSong(event.getArgs(), event);
     }
 }

@@ -19,6 +19,7 @@ public class PlaylistCommand extends Command{
 
     @Override
     protected void execute(CommandEvent event) {
+        event.getChannel().sendTyping().queue();
         manager.getPlaylist(event);
     }
 }
