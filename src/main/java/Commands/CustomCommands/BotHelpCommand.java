@@ -39,6 +39,12 @@ public class BotHelpCommand extends ListenerAdapter {
         ebSys.setColor(Configuration.kEmbedColor);
         ebSys.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
 
+        EmbedBuilder ebFun = new EmbedBuilder();
+
+        ebFun.setTitle("Fun Commands");
+        ebFun.setColor(Configuration.kEmbedColor);
+        ebFun.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
+
         //ignore cuz bot
         if (event.getAuthor().isBot()) {
             return;
@@ -53,11 +59,14 @@ public class BotHelpCommand extends ListenerAdapter {
                     ebLeague.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
                 } else if (command.getCategory().getName().equalsIgnoreCase("Owner")) {
                     ebSys.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
+                } else if (command.getCategory().getName().equalsIgnoreCase("Fun")) {
+                    ebFun.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
                 }
             }
 
             event.getChannel().sendMessage(ebMusic.build()).queue();
             event.getChannel().sendMessage(ebLeague.build()).queue();
+            event.getChannel().sendMessage(ebFun.build()).queue();
 
             if (event.getAuthor().getId().equals(Configuration.kOwnerId)) {
                 event.getChannel().sendMessage(ebSys.build()).queue();
