@@ -18,6 +18,15 @@ public class PlayCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        if (event.getMember().getVoiceState() == null) {
+            return;
+        }
+
+        if (!event.getMember().getVoiceState().inVoiceChannel()) {
+            event.reply("You are not currently in a voice channel!");
+            return;
+        }
+
         manager.startSong(event.getArgs(), event);
     }
 }

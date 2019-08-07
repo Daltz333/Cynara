@@ -97,4 +97,8 @@ public class TrackScheduler extends AudioEventAdapter {
         }
         nextTrack();
     }
+
+    public void clearQueue() {
+        queue.clear();
+    }
 }

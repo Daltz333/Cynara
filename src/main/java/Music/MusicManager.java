@@ -90,6 +90,7 @@ public class MusicManager {
     public void stop(CommandEvent event) {
         event.getChannel().sendMessage("Stopping Song!").queue();
         event.getGuild().getAudioManager().closeAudioConnection();
+        trackScheduler.clearQueue();
         player.destroy();
     }
 
