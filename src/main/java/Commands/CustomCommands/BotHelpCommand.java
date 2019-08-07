@@ -72,22 +72,28 @@ public class BotHelpCommand extends ListenerAdapter {
                 }
             }
 
-            event.getChannel().sendMessage(ebMusic.build()).queue();
-            event.getChannel().sendMessage(ebLeague.build()).queue();
-            event.getChannel().sendMessage(ebFun.build()).queue();
+            event.getChannel().sendMessage("Check your DMs " + event.getAuthor().getAsMention()).queue();
 
-            if (event.getMember() == null) {
-                logger.warn("Author is not a member!");
-                return;
-            }
+            //send to dm
+            event.getAuthor().openPrivateChannel().queue(channel -> {
+                channel.sendMessage(ebMusic.build()).queue();
+                channel.sendMessage(ebLeague.build()).queue();
+                channel.sendMessage(ebFun.build()).queue();
 
-            if(event.getAuthor().getId().equalsIgnoreCase(Configuration.kOwnerId) || event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-                event.getChannel().sendMessage(ebAdmin.build()).queue();
-            }
+                if (event.getMember() == null) {
+                    logger.warn("Author is not a member!");
+                    return;
+                }
 
-            if (event.getAuthor().getId().equals(Configuration.kOwnerId)) {
-                event.getChannel().sendMessage(ebSys.build()).queue();
-            }
+                if(event.getAuthor().getId().equalsIgnoreCase(Configuration.kOwnerId) || event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+                    channel.sendMessage(ebAdmin.build()).queue();
+                }
+
+                if (event.getAuthor().getId().equals(Configuration.kOwnerId)) {
+                    channel.sendMessage(ebSys.build()).queue();
+                }
+            });
+
         }
     }
 }

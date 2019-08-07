@@ -7,6 +7,7 @@ import Commands.LeagueCommands.RandomChampCommand;
 import Commands.MemeCommands.AnimemeCommand;
 import Commands.MemeCommands.InsultCommand;
 import Commands.MusicCommands.*;
+import Commands.SysAdminCommands.AddEmojiCommand;
 import Commands.SysAdminCommands.PurgeCommand;
 import Commands.SysAdminCommands.SpecsCommand;
 import Constants.Configuration;
@@ -109,7 +110,7 @@ public class Main {
                 new CurrentRotationCommand(api), new SpecsCommand(), new PlayCommand(manager),
                 new StopCommand(manager), new SkipCommand(manager), new PlaylistCommand(manager),
                 new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api), new AnimemeCommand(reddit),
-                new PurgeCommand(), new InsultCommand());
+                new PurgeCommand(), new InsultCommand(), new AddEmojiCommand());
 
         CommandClient client = builder.build();
 
