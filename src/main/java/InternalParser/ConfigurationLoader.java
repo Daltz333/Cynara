@@ -27,7 +27,7 @@ public class ConfigurationLoader {
             throw new IOException("Path to config is null!");
         }
 
-        Files.copy(pathToConfig, Paths.get("config.json"), REPLACE_EXISTING);
+        Files.copy(pathToConfig, Paths.get(getCurrentDir() + File.separator + "config.json"), REPLACE_EXISTING);
     }
 
     public static String getCurrentDir() {

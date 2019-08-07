@@ -9,6 +9,7 @@ import Commands.SysAdminCommands.SpecsCommand;
 import Constants.Configuration;
 import InternalParser.ConfigurationLoader;
 import InternalParser.JsonLoader;
+import InternalParser.JsonLol.DataType;
 import Music.MusicManager;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -39,7 +40,11 @@ public class Main {
         JsonLoader jsonLoader = new JsonLoader();
 
         //load champion static information
-        jsonLoader.loadChampions();
+        jsonLoader.loadJson(Main.class.getClassLoader().getResourceAsStream("DDragon/champion.json"), DataType.CHAMPIONS);
+        jsonLoader.loadJson(Main.class.getClassLoader().getResourceAsStream("DDragon/runesReforged.json"), DataType.RUNES);
+
+        System.out.println(JsonLoader.runesPrimary);
+        System.out.println(JsonLoader.runesSecondary);
 
         try {
             ConfigurationLoader.copyTemplateJSON();

@@ -2,15 +2,16 @@ package Commands.LeagueCommands;
 
 import Constants.Configuration;
 import Handlers.RateLimitHandler;
-import InternalParser.JsonChampion;
+import InternalParser.JsonLol.JsonChampion;
 import InternalParser.JsonLoader;
+import InternalParser.JsonLol.JsonRune;
+import InternalParser.JsonLol.JsonRunePrimary;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.rithms.riot.api.RiotApi;
 import net.rithms.riot.api.RiotApiException;
 import net.rithms.riot.api.endpoints.spectator.dto.*;
-import net.rithms.riot.api.endpoints.static_data.dto.Champion;
 import net.rithms.riot.api.endpoints.summoner.dto.Summoner;
 import net.rithms.riot.api.request.ratelimit.RateLimitException;
 import net.rithms.riot.constant.Platform;
@@ -100,7 +101,35 @@ public class LeagueSpectatorCommand extends Command {
             }
 
             eb.addField("Playing As", currentChampion, false);
-            eb.addField("Runes", "TODO", false);
+
+            String perkNames = "";
+            for (long perkId : participant.getPerks().getPerkIds()) {
+                boolean found = false;
+
+                for (JsonRunePrimary primary : JsonLoader.runesPrimary) {
+                    if (primary.getId() == perkId) {
+                        found = true;
+                        perkNames = perkNames + primary.getName() + " ";
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    for (JsonRune secondary : JsonLoader.runesSecondary) {
+                        if (secondary.getId() == perkId) {
+                            found = true;
+                            perkNames = perkNames + secondary.getName() + " ";
+                            break;
+                        }
+                    }
+                }
+
+                if (!found) {
+                    logger.warn("Unknown Perk ID! " + perkId);
+                }
+            }
+
+            eb.addField("Runes", perkNames, false);
 
             String items = "";
 
@@ -112,9 +141,15 @@ public class LeagueSpectatorCommand extends Command {
 
         } catch (RateLimitException e1) {
             event.reply("Currently being rate limited! Please try again later!");
+            RateLimitHandler.setRateLimit(e1.getRetryAfter());
             return;
 
         } catch (RiotApiException e2) {
+            if (e2.getErrorCode() == 404) {
+                event.reply("Requested summoner was not found, or is not currently in a game!");
+                return;
+            }
+
             logger.error("Exception: ", e2);
         }
 

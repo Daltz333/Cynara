@@ -2,7 +2,7 @@ package Commands.LeagueCommands;
 
 import Constants.Configuration;
 import Handlers.RateLimitHandler;
-import InternalParser.JsonChampion;
+import InternalParser.JsonLol.JsonChampion;
 import InternalParser.JsonLoader;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

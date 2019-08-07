@@ -1,4 +1,4 @@
-package InternalParser;
+package InternalParser.JsonLol;
 
 public class JsonChampion {
     private String id;
