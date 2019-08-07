@@ -36,8 +36,10 @@ public class Main {
     private static JDA jda;
 
     public static void main(String[] args) {
+        JsonLoader jsonLoader = new JsonLoader();
+
         //load champion static information
-        JsonLoader.loadChampions();
+        jsonLoader.loadChampions();
 
         try {
             ConfigurationLoader.copyTemplateJSON();

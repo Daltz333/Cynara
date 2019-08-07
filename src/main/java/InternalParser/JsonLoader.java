@@ -13,12 +13,12 @@ public class JsonLoader {
     public static ArrayList<JsonChampion> champions = new ArrayList<>();
     private static Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
 
-    public static void loadChampions() {
+    public void loadChampions() {
         logger.info("Parsing Champion Information");
 
         champions.clear();
 
-        Scanner scanner = new Scanner(JsonLoader.class.getResourceAsStream("../DDragon/champion.json"));
+        Scanner scanner = new Scanner(getClass().getClassLoader().getResourceAsStream("DDragon/champion.json"));
         StringBuilder json = new StringBuilder();
 
         while (scanner.hasNext()) {
