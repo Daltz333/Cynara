@@ -46,7 +46,7 @@ public class MusicManager {
         playerManager.loadItem(id, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                event.getChannel().sendMessage("Adding to queue ``" + track.getInfo().title + "``").queue();
+                event.getChannel().sendMessage("Adding to queue: ``" + track.getInfo().title + "``").queue();
 
                 play(event, track);
             }
@@ -59,7 +59,7 @@ public class MusicManager {
                     firstTrack = playlist.getTracks().get(0);
                 }
 
-                event.getChannel().sendMessage("Adding to queue " + firstTrack.getInfo().title + " (first track of playlist " + playlist.getName() + ")").queue();
+                event.getChannel().sendMessage("Adding to queue: " + firstTrack.getInfo().title + " (first track of playlist " + playlist.getName() + ")").queue();
 
                 play(event, firstTrack);
             }

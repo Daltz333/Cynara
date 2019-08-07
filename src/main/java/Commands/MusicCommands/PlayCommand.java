@@ -11,6 +11,7 @@ public class PlayCommand extends Command {
         this.name = "play";
         this.category = new Category("Music");
         this.arguments = "youtubeURL";
+        this.help = "Plays the specified track or URL.";
 
         this.manager = manager;
     }
