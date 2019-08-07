@@ -26,6 +26,7 @@ public class CurrentRotationCommand extends Command {
         this.help = "Returns the current champion rotation.";
         this.api = api;
         this.arguments = "region";
+        this.category = new Category("League");
     }
 
     @Override

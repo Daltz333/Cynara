@@ -18,6 +18,7 @@ public class ChampInfoCommand extends Command {
         this.aliases = new String[]{"ci"};
         this.help = "Details basic information on the champion.";
         this.arguments = "championName";
+        this.category = new Category("League");
     }
 
     @Override

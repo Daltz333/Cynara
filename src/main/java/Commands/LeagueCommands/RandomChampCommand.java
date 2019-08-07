@@ -17,6 +17,7 @@ public class RandomChampCommand extends Command {
         this.aliases = new String[]{"randomchampion", "randomchamp", "randchamp"};
         this.help = "Retrieves a random LoL champion.";
         this.arguments = "none";
+        this.category = new Category("League");
     }
 
     @Override

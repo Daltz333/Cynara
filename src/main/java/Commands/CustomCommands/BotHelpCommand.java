@@ -21,11 +21,23 @@ public class BotHelpCommand extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        EmbedBuilder eb = new EmbedBuilder();
+        EmbedBuilder ebMusic = new EmbedBuilder();
 
-        eb.setTitle("Help Commands");
-        eb.setColor(Configuration.kEmbedColor);
-        eb.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
+        ebMusic.setTitle("Music Commands");
+        ebMusic.setColor(Configuration.kEmbedColor);
+        ebMusic.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
+
+        EmbedBuilder ebLeague = new EmbedBuilder();
+
+        ebLeague.setTitle("League Commands");
+        ebLeague.setColor(Configuration.kEmbedColor);
+        ebLeague.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
+
+        EmbedBuilder ebSys = new EmbedBuilder();
+
+        ebSys.setTitle("Owner Commands");
+        ebSys.setColor(Configuration.kEmbedColor);
+        ebSys.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
 
         //ignore cuz bot
         if (event.getAuthor().isBot()) {
@@ -35,10 +47,21 @@ public class BotHelpCommand extends ListenerAdapter {
         //iterate over the command objects, and display their help and name values
         if (event.getMessage().getContentDisplay().startsWith(client.getPrefix() + "help")) {
             for (Command command : client.getCommands()) {
-                eb.addField(command.getName(), command.getHelp() + " args: " + command.getArguments(), false);
+                if (command.getCategory().getName().equalsIgnoreCase("Music")) {
+                    ebMusic.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
+                } else if (command.getCategory().getName().equalsIgnoreCase("League")) {
+                    ebLeague.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
+                } else if (command.getCategory().getName().equalsIgnoreCase("Owner")) {
+                    ebSys.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
+                }
             }
 
-            event.getChannel().sendMessage(eb.build()).queue();
+            event.getChannel().sendMessage(ebMusic.build()).queue();
+            event.getChannel().sendMessage(ebLeague.build()).queue();
+
+            if (event.getAuthor().getId().equals(Configuration.kOwnerId)) {
+                event.getChannel().sendMessage(ebSys.build()).queue();
+            }
         }
     }
 }

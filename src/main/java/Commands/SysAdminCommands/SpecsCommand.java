@@ -14,6 +14,7 @@ public class SpecsCommand extends Command {
         this.ownerCommand = true;
         this.help = "Retrieves the system specs of the host machine.";
         this.arguments = "none";
+        this.category = new Category("Owner");
     }
 
     @Override

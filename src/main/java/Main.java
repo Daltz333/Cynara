@@ -2,8 +2,9 @@ import Commands.CustomCommands.BotHelpCommand;
 import Commands.CustomCommands.DadBotCustomCommand;
 import Commands.LeagueCommands.ChampInfoCommand;
 import Commands.LeagueCommands.CurrentRotationCommand;
+import Commands.LeagueCommands.LeagueSpectatorCommand;
 import Commands.LeagueCommands.RandomChampCommand;
-import Commands.MusicCommands.PlayCommand;
+import Commands.MusicCommands.*;
 import Commands.SysAdminCommands.SpecsCommand;
 import Constants.Configuration;
 import InternalParser.ConfigurationLoader;
@@ -83,7 +84,10 @@ public class Main {
         builder.setActivity(Activity.playing(Configuration.kActivityText));
         builder.useHelpBuilder(false);
 
-        builder.addCommands(new ChampInfoCommand(), new RandomChampCommand(), new CurrentRotationCommand(api), new SpecsCommand(), new PlayCommand(manager));
+        builder.addCommands(new ChampInfoCommand(), new RandomChampCommand(),
+                new CurrentRotationCommand(api), new SpecsCommand(), new PlayCommand(manager),
+                new StopCommand(manager), new SkipCommand(manager), new PlaylistCommand(manager),
+                new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api));
 
         CommandClient client = builder.build();
 

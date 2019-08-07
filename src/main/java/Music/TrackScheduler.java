@@ -7,6 +7,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -21,6 +23,14 @@ public class TrackScheduler extends AudioEventAdapter {
         this.queue = new LinkedBlockingQueue<>();
     }
 
+    public void queue(AudioTrack track, CommandEvent event) {
+        this.event = event;
+
+        if (!player.startTrack(track, true)) {
+            queue.offer(track);
+        }
+    }
+
     @Override
     public void onPlayerPause(AudioPlayer player) {
         // Player was paused
@@ -33,17 +43,23 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        // A track started playing
+        event.getChannel().sendMessage("Now playing ``" + track.getInfo().title +"``!").queue();
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (endReason.mayStartNext) {
-            // Start next track
+            nextTrack();
         } else if (endReason == AudioTrackEndReason.FINISHED) {
             // Track finished
         } else {
             //confusion??
+        }
+
+        try {
+            queue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         // endReason == FINISHED: A track finished or died by an exception (mayStartNext = true).
@@ -69,5 +85,16 @@ public class TrackScheduler extends AudioEventAdapter {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
         player.startTrack(queue.poll(), false);
+    }
+
+    public ArrayList<AudioTrack> getQueue() {
+        return new ArrayList<>(queue);
+    }
+
+    public void skipToTrack(int trackNum) {
+        for (int i = 0; i < trackNum - 1; i++) {
+            queue.remove();
+        }
+        nextTrack();
     }
 }

@@ -10,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,23 +32,27 @@ public class MusicManager {
     }
 
     public void startSong(String songUrl, CommandEvent event) {
+        String patternPlaylist = "(?:http|https|)(?::\\/\\/|)(?:www.|)(?:youtu\\.be\\/|youtube\\.com(?:\\/embed\\/|\\/v\\/|\\/watch\\?v=|\\/ytscreeningroom\\?v=|\\/feeds\\/api\\/videos\\/|\\/user\\S*[^\\w\\-\\s]|\\S*[^\\w\\-\\s]))([\\w\\-]{12,})[a-z0-9;:@#?&%=+\\/\\$_.-]*";
+        Pattern compiledPatternPlaylist = Pattern.compile(patternPlaylist);
+        Matcher matcherPlaylist = compiledPatternPlaylist.matcher(songUrl);
+
         String pattern = "(?<=youtu.be/|watch\\?v=|/videos/|embed\\/)[^#\\&\\?]*";
         Pattern compiledPattern = Pattern.compile(pattern);
         Matcher matcher = compiledPattern.matcher(songUrl);
 
         String id = songUrl;
 
-        if(matcher.find()){
+        if(matcherPlaylist.find()){
+            id = matcherPlaylist.group();
+        } else if (matcher.find()){
             id = matcher.group();
         }
 
-        System.out.println(id);
+        logger.info("Playing: " + id);
 
         playerManager.loadItem(id, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                event.getChannel().sendMessage("Adding to queue: ``" + track.getInfo().title + "``").queue();
-
                 play(event, track);
             }
 
@@ -59,7 +64,9 @@ public class MusicManager {
                     firstTrack = playlist.getTracks().get(0);
                 }
 
-                event.getChannel().sendMessage("Adding to queue: " + firstTrack.getInfo().title + " (first track of playlist " + playlist.getName() + ")").queue();
+                for (AudioTrack track : playlist.getTracks()) {
+                    trackScheduler.queue(track, event);
+                }
 
                 play(event, firstTrack);
             }
@@ -76,9 +83,41 @@ public class MusicManager {
         });
     }
 
-    private void skipTrack(CommandEvent event) {
+    public void skipTrack(CommandEvent event) {
         trackScheduler.nextTrack();
-        event.getChannel().sendMessage("Skipped to next track.").queue();
+    }
+
+    public void stop(CommandEvent event) {
+        event.getChannel().sendMessage("Stopping Song!").queue();
+        event.getGuild().getAudioManager().closeAudioConnection();
+        player.destroy();
+    }
+
+    public void skipToTrack() {
+
+    }
+
+    public void getPlaylist(CommandEvent event) {
+        String playlist = "Upcoming Songs: \n ```";
+        int i = 0;
+        for (AudioTrack track : trackScheduler.getQueue()) {
+            i++;
+            playlist = playlist + i + ". " + track.getInfo().title + "\n";
+
+            //limit to 30 to avoid discord from being dumb
+            if (i > 30) {
+                break;
+            }
+        }
+
+        playlist = playlist + "```";
+
+
+        event.getChannel().sendMessage(playlist).queue();
+    }
+
+    public void skipToTrack(int trackNum) {
+        trackScheduler.skipToTrack(trackNum);
     }
 
     private void play(CommandEvent event, AudioTrack track) {
@@ -93,5 +132,7 @@ public class MusicManager {
         } else {
             event.getGuild().getAudioManager().openAudioConnection(event.getMember().getVoiceState().getChannel());
         }
+
+        trackScheduler.queue(track,event);
     }
 }
