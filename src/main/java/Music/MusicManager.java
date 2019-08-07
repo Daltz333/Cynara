@@ -99,6 +99,11 @@ public class MusicManager {
     }
 
     public void getPlaylist(CommandEvent event) {
+        if (trackScheduler.getQueue().isEmpty()) {
+            event.reply("There are no songs currently in the queue!");
+            return;
+        }
+
         String playlist = "Upcoming Songs: \n ```";
         int i = 0;
         for (AudioTrack track : trackScheduler.getQueue()) {
