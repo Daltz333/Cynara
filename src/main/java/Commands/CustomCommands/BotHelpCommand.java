@@ -4,9 +4,9 @@ import Constants.Configuration;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +45,12 @@ public class BotHelpCommand extends ListenerAdapter {
         ebFun.setColor(Configuration.kEmbedColor);
         ebFun.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
 
+        EmbedBuilder ebAdmin = new EmbedBuilder();
+
+        ebAdmin.setTitle("Administrator Commands");
+        ebAdmin.setColor(Configuration.kEmbedColor);
+        ebAdmin.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
+
         //ignore cuz bot
         if (event.getAuthor().isBot()) {
             return;
@@ -61,12 +67,23 @@ public class BotHelpCommand extends ListenerAdapter {
                     ebSys.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
                 } else if (command.getCategory().getName().equalsIgnoreCase("Fun")) {
                     ebFun.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
+                } else if (command.getCategory().getName().equalsIgnoreCase("Admin")) {
+                    ebAdmin.addField(command.getName(), command.getHelp() + " - args: " + command.getArguments(), false);
                 }
             }
 
             event.getChannel().sendMessage(ebMusic.build()).queue();
             event.getChannel().sendMessage(ebLeague.build()).queue();
             event.getChannel().sendMessage(ebFun.build()).queue();
+
+            if (event.getMember() == null) {
+                logger.warn("Author is not a member!");
+                return;
+            }
+
+            if(event.getAuthor().getId().equalsIgnoreCase(Configuration.kOwnerId) || event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+                event.getChannel().sendMessage(ebAdmin.build()).queue();
+            }
 
             if (event.getAuthor().getId().equals(Configuration.kOwnerId)) {
                 event.getChannel().sendMessage(ebSys.build()).queue();

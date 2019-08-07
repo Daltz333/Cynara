@@ -11,7 +11,7 @@ import java.awt.*;
 import java.io.IOException;
 
 public class ChampInfoCommand extends Command {
-    Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
+    private Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
 
     public ChampInfoCommand() {
         this.name = "lolchamp";

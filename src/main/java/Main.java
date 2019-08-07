@@ -5,7 +5,9 @@ import Commands.LeagueCommands.CurrentRotationCommand;
 import Commands.LeagueCommands.LeagueSpectatorCommand;
 import Commands.LeagueCommands.RandomChampCommand;
 import Commands.MemeCommands.AnimemeCommand;
+import Commands.MemeCommands.InsultCommand;
 import Commands.MusicCommands.*;
+import Commands.SysAdminCommands.PurgeCommand;
 import Commands.SysAdminCommands.SpecsCommand;
 import Constants.Configuration;
 import InternalParser.ConfigurationLoader;
@@ -106,7 +108,8 @@ public class Main {
         builder.addCommands(new ChampInfoCommand(), new RandomChampCommand(),
                 new CurrentRotationCommand(api), new SpecsCommand(), new PlayCommand(manager),
                 new StopCommand(manager), new SkipCommand(manager), new PlaylistCommand(manager),
-                new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api), new AnimemeCommand(reddit));
+                new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api), new AnimemeCommand(reddit),
+                new PurgeCommand(), new InsultCommand());
 
         CommandClient client = builder.build();
 
