@@ -4,7 +4,7 @@ General Purpose League of Legends Discord Bot. Note that this bot is very much, 
 
 ## Technical Features
 
-1. Crawls Champion.GG and stores Champion/League data into a Mongo database.
+1. Crawls Champion.GG and stores Champion/League data into a database.
 2. Uses Java JDAv4 with JDA utils for an easy-to-modify command based system
 3. Can play music from various streams (Youtube, Soundcloud, etc)
 
