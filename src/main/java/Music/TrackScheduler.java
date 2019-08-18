@@ -15,8 +15,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackScheduler extends AudioEventAdapter {
     private AudioPlayer player;
     private final BlockingQueue<AudioTrack> queue;
-
     private CommandEvent event;
+
+    public boolean isPlaying = false;
 
     public TrackScheduler(AudioPlayer player) {
         this.player = player;
@@ -43,11 +44,15 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        isPlaying = true;
+
         event.getChannel().sendMessage("Now playing ``" + track.getInfo().title +"``!").queue();
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        isPlaying = false;
+
         if (endReason.mayStartNext) {
             nextTrack();
         } else if (endReason == AudioTrackEndReason.FINISHED) {
@@ -102,5 +107,9 @@ public class TrackScheduler extends AudioEventAdapter {
         for (int i = 0; i < queue.remainingCapacity(); i++) {
             queue.remove();
         }
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
     }
 }

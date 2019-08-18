@@ -55,7 +55,7 @@ public class Main {
         try {
             ConfigurationLoader.copyTemplateJSON();
         } catch (IOException e) {
-            logger.error("Failed to copy template json!");
+            logger.error("Failed to copy template json!", e);
             return;
         }
 

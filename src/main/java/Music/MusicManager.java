@@ -40,6 +40,11 @@ public class MusicManager {
         Pattern compiledPattern = Pattern.compile(pattern);
         Matcher matcher = compiledPattern.matcher(songUrl);
 
+        if (trackScheduler.getQueue().size() > 100) {
+            event.reply("The maximum number of songs (100) allowed to be queued has been reached!");
+            return;
+        }
+
         String id = songUrl;
 
         if(matcherPlaylist.find()){
@@ -53,7 +58,14 @@ public class MusicManager {
         playerManager.loadItem(id, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                play(event, track);
+                trackScheduler.queue(track, event);
+
+                //only play if we're not currently playing anything
+                if (!trackScheduler.isPlaying) {
+                    play(event);
+                } else {
+                    event.reply(track.getInfo().title + " has been added to the queue!");
+                }
             }
 
             @Override
@@ -68,7 +80,11 @@ public class MusicManager {
                     trackScheduler.queue(track, event);
                 }
 
-                play(event, firstTrack);
+                if (!trackScheduler.isPlaying) {
+                    play(event);
+                } else {
+                    event.reply(playlist.getName() + " has been added to the queue!");
+                }
             }
 
             @Override
@@ -117,7 +133,6 @@ public class MusicManager {
 
         playlist = playlist + "```";
 
-
         event.getChannel().sendMessage(playlist).queue();
     }
 
@@ -125,7 +140,7 @@ public class MusicManager {
         trackScheduler.skipToTrack(trackNum);
     }
 
-    private void play(CommandEvent event, AudioTrack track) {
+    private void play(CommandEvent event) {
         event.getGuild().getAudioManager().setSendingHandler(new AudioPlayerSendHandler(player));
 
         //join voice channel, only if bot is not already connected
@@ -137,7 +152,5 @@ public class MusicManager {
         } else {
             event.getGuild().getAudioManager().openAudioConnection(event.getMember().getVoiceState().getChannel());
         }
-
-        trackScheduler.queue(track,event);
     }
 }
