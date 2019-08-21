@@ -47,7 +47,7 @@ public class AnimemeCommand extends Command {
         if (obtainImages) {
             for (Submission post : posts.next()) {
                 if (!post.isSelfPost() && (post.getUrl().contains("i.redd.it") || post.getUrl().contains("imgur.com"))) {
-                    if (post.getUrl().contains(".png") || post.getUrl().contains(".jpg")) {
+                    if (post.getUrl().contains(".png") || post.getUrl().contains(".jpg") || post.getUrl().contains(".gif")) {
                         images.add(post.getUrl());
                     }
                 }
