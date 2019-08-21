@@ -20,6 +20,8 @@ import java.util.Random;
 public class AnimemeCommand extends Command {
     private Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
     private RedditClient client;
+    private List<String> images = new ArrayList<>();
+    private boolean obtainImages = true;
 
     public AnimemeCommand(RedditClient redditClient) {
         this.name = "animeme";
@@ -34,15 +36,24 @@ public class AnimemeCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         SubredditReference reference = client.subreddit("Animemes");
-        DefaultPaginator<Submission> posts = reference.posts().limit(100).build();
+        DefaultPaginator<Submission> posts = reference.posts().limit(5).build();
 
         event.getChannel().sendTyping().queue();
 
-        List<String> images = new ArrayList<>();
-        for (Submission post : posts.next()) {
-            if (!post.isSelfPost() && (post.getUrl().contains("i.redd.it") || post.getUrl().contains("imgur.com"))) {
-                images.add(post.getUrl());
+        if (images.size() <= 0) {
+            obtainImages = true;
+        }
+
+        if (obtainImages) {
+            for (Submission post : posts.next()) {
+                if (!post.isSelfPost() && (post.getUrl().contains("i.redd.it") || post.getUrl().contains("imgur.com"))) {
+                    if (post.getUrl().contains(".png") || post.getUrl().contains(".jpg")) {
+                        images.add(post.getUrl());
+                    }
+                }
             }
+
+            obtainImages = false;
         }
 
         EmbedBuilder eb = new EmbedBuilder();
@@ -57,9 +68,19 @@ public class AnimemeCommand extends Command {
             return;
         }
 
-        int index = random.nextInt(images.size());
+        //bound has a minimum requirement of 1, so index of 0 is invalid
+        int index;
+        if (images.size() != 1) {
+            index = random.nextInt(images.size() - 1);
+        } else {
+            index = 0;
+        }
+
+        String image = images.get(index);
 
         eb.setImage(images.get(index));
+
+        images.remove(index);
 
         event.reply(eb.build());
     }
