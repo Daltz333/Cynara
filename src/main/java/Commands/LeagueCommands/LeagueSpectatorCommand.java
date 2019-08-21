@@ -69,7 +69,7 @@ public class LeagueSpectatorCommand extends Command {
             if(args.length > 2) {
                 for (int i = 0; i < args.length; i++) {
                     if (i >= 2) {
-                        args[1] = args[1] + "%20" + args[i];
+                        args[1] = args[1] + " " + args[i];
                     }
                 }
             }
