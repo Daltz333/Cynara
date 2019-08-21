@@ -65,7 +65,19 @@ public class LeagueSpectatorCommand extends Command {
         }
 
         try {
+            //iterate over our args, append every arg after region, replace with html space code
+            if(args.length > 2) {
+                for (int i = 0; i < args.length; i++) {
+                    if (i >= 2) {
+                        args[1] = args[1] + "%20" + args[i];
+                    }
+                }
+            }
+
             Summoner summoner = api.getSummonerByName(region, args[1]);
+
+            logger.info("Using summonerID of " + summoner.getAccountId());
+
             CurrentGameInfo summonerGame = api.getActiveGameBySummoner(region, summoner.getId());
 
             if (summonerGame == null) {
@@ -87,7 +99,7 @@ public class LeagueSpectatorCommand extends Command {
             }
 
             eb.addField("Banned Champions", bannedChampions, false);
-            eb.addField("Game Length", String.valueOf(summonerGame.getGameLength()/60) + " minutes", false);
+            eb.addField("Game Length", summonerGame.getGameLength() / 60 + " minutes", false);
 
             CurrentGameParticipant participant = summonerGame.getParticipantByParticipantId(summoner.getId());
 
