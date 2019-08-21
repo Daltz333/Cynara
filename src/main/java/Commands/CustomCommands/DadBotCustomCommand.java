@@ -10,11 +10,7 @@ public class DadBotCustomCommand extends ListenerAdapter {
 
         double randNumber = Math.random();
 
-        if (randNumber < 0.75) {
-            return;
-        }
-
-        if (event.getAuthor().isBot()) {
+        if (randNumber < 0.75 || event.getAuthor().isBot()) {
             return;
         }
 
