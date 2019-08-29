@@ -1,5 +1,6 @@
 import Commands.CustomCommands.BotHelpCommand;
 import Commands.CustomCommands.DadBotCustomCommand;
+import Commands.CustomCommands.LeagueNewsCommand;
 import Commands.LeagueCommands.ChampInfoCommand;
 import Commands.LeagueCommands.CurrentRotationCommand;
 import Commands.LeagueCommands.LeagueSpectatorCommand;
@@ -8,6 +9,7 @@ import Commands.MemeCommands.AnimemeCommand;
 import Commands.MemeCommands.InsultCommand;
 import Commands.MusicCommands.*;
 import Commands.SysAdminCommands.AddEmojiCommand;
+import Commands.SysAdminCommands.MoveMusicChannelCommand;
 import Commands.SysAdminCommands.PurgeCommand;
 import Commands.SysAdminCommands.SpecsCommand;
 import Constants.Configuration;
@@ -15,6 +17,8 @@ import InternalParser.ConfigurationLoader;
 import InternalParser.JsonLoader;
 import InternalParser.JsonLol.DataType;
 import Music.MusicManager;
+import Utils.Pair;
+import Utils.SettingsProvider;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -38,7 +42,9 @@ import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
     private static Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
@@ -46,6 +52,7 @@ public class Main {
     private static JDA jda;
 
     public static void main(String[] args) {
+        //ConfigurationLoader.createDb();
         JsonLoader jsonLoader = new JsonLoader();
 
         //load champion static information
@@ -110,7 +117,7 @@ public class Main {
                 new CurrentRotationCommand(api), new SpecsCommand(), new PlayCommand(manager),
                 new StopCommand(manager), new SkipCommand(manager), new PlaylistCommand(manager),
                 new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api), new AnimemeCommand(reddit),
-                new PurgeCommand(), new InsultCommand(), new AddEmojiCommand());
+                new PurgeCommand(), new InsultCommand(), new AddEmojiCommand(), new MoveMusicChannelCommand());
 
         CommandClient client = builder.build();
 
@@ -118,7 +125,7 @@ public class Main {
             jda = new JDABuilder(AccountType.BOT).setToken(botToken).build();
 
             //loader our client and custom commands
-            jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client));
+            jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
         } catch (LoginException e) {
             logger.error("Exception: ", e);
         }

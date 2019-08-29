@@ -72,6 +72,9 @@ public class BotHelpCommand extends ListenerAdapter {
                 }
             }
 
+            ebAdmin.addField("rssenable", "Enables the league feed to the channel - args: none", false);
+            ebAdmin.addField("rssdisable", "Disables the league feed to the channel - args: none", false);
+
             event.getChannel().sendMessage("Check your DMs " + event.getAuthor().getAsMention()).queue();
 
             //send to dm
