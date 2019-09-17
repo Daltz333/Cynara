@@ -136,18 +136,18 @@ public class Main {
                 dbLess = true;
             }
 
-            if (!dbLess && connection != null) {
-                for (Guild guild : jda.getGuilds()) {
-                    try {
-                        connection.createStatement().execute("IF NOT EXISTS(SELECT * FROM " + guild.getId() + ") BEGIN CREATE TABLE " + guild.getId());
-                    } catch (SQLException ex) {
-                        logger.error("Error creating statement for guild " + guild.getId());
-                    }
-                }
-            }
-
             try {
                 jda = new JDABuilder(AccountType.BOT).setToken(botToken).build();
+
+                if (!dbLess && connection != null) {
+                    for (Guild guild : jda.getGuilds()) {
+                        try {
+                            connection.createStatement().execute("IF NOT EXISTS(SELECT * FROM " + guild.getId() + ") BEGIN CREATE TABLE " + guild.getId());
+                        } catch (SQLException ex) {
+                            logger.error("Error creating statement for guild " + guild.getId());
+                        }
+                    }
+                }
 
                 //loader our client and custom commands
                 jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
@@ -155,11 +155,7 @@ public class Main {
                 logger.error("Exception: ", e);
             }
         } catch (RuntimeException e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace();
-
-            logger.error("UNCAUGHTEXCEPTION: " + sw.toString());
+            logger.error("UNCAUGHTEXCEPTION: ", e);
         }
     }
 }
