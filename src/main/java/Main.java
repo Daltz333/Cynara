@@ -145,6 +145,7 @@ public class Main {
                     try {
                         query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, Bot_Prefix char(255), PRIMARY KEY(Guild_ID))";
                         connection.createStatement().execute(query);
+                        connection.close();
                     } catch (SQLException ex) {
                         logger.error("Error creating statement for guild ", ex);
                     }

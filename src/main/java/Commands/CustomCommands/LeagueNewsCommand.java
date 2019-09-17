@@ -11,9 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class LeagueNewsCommand extends ListenerAdapter {
@@ -36,7 +34,8 @@ public class LeagueNewsCommand extends ListenerAdapter {
             boolean found = false;
             for (Pair guilds : RssLeagueThread.subscriberGuilds) {
                 String guildData = (String)guilds.getKey();
-                if (guildData.equals(event.getGuild().getId())) {
+                if (guildData.equalsIgnoreCase(event.getGuild().getId())) {
+                    logger.info("Guild is already subscribed!");
                     found = true;
                 }
             }
@@ -44,10 +43,24 @@ public class LeagueNewsCommand extends ListenerAdapter {
             if (!found) {
                 RssLeagueThread.subscriberGuilds.add(guild);
                 try {
-                String query = "INSERT INTO MAIN_GUILD_DATA (Guild_ID, Member_Id, Member_Name, Member_Xp, Riot_Rss_Enable, Riot_Rss_Channel, Bot_Prefix) VALUES (" + event.getGuild().getId() + ", NULL, NULL, NULL, 1," + event.getTextChannel().getId() + ", NULL)";
+                    String doesExist = "SELECT * FROM MAIN_GUILD_DATA WHERE Guild_ID=" + event.getGuild().getId();
+                    String query = "INSERT INTO MAIN_GUILD_DATA (Guild_ID, Member_Id, Member_Name, Member_Xp, Riot_Rss_Enable, Riot_Rss_Channel, Bot_Prefix) VALUES (" + event.getGuild().getId() + ", NULL, NULL, NULL, 1," + event.getTextChannel().getId() + ", NULL) WHERE NOT EXISTS(SELECT * FROM MAIN_GUILD_DATA WHERE Guild_ID= " + event.getGuild().getId() + ")";
+                    String updateDb = "UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=1, Riot_Rss_Channel=" + event.getTextChannel().getId() + " WHERE Guild_ID=" + event.getGuild().getId();
                     Connection connection = DriverManager.getConnection(Configuration.kDatabaseUrl);
-                    connection.createStatement().execute(query);
+                    logger.info("Using query \n" + query);
+                    ResultSet data = connection.createStatement().executeQuery(doesExist);
 
+                    boolean update = false;
+                    if (data.next()) {
+                        update = true;
+                    }
+
+                    if (update) {
+                        connection.createStatement().execute(updateDb);
+                    } else {
+                        connection.createStatement().execute(query);
+                    }
+                    connection.close();
                 } catch (SQLException e) {
                     logger.error("Unable to add RSS subscriber to database", e);
                 }
@@ -60,13 +73,23 @@ public class LeagueNewsCommand extends ListenerAdapter {
         } else if (event.getMessage().getContentDisplay().startsWith(Configuration.kBotPrefix + "rssdisable")) {
             int i = 0;
             for (Pair guilds : RssLeagueThread.subscriberGuilds) {
-                i++;
                 String guildData = (String)guilds.getKey();
                 if (guildData.equals(event.getGuild().getId())) {
+                    try {
+                        String query = "UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=0 WHERE Guild_ID=" + event.getGuild().getId();
+                        Connection connection = DriverManager.getConnection(Configuration.kDatabaseUrl);
+                        connection.createStatement().execute(query);
+                        connection.close();
+                    } catch (SQLException e) {
+                        logger.error("Unable to disconnect database!", e);
+                        event.getTextChannel().sendMessage("Unable to disconnect database!").queue();
+                        return;
+                    }
                     event.getChannel().sendMessage("Guild found, successfully removed!").queue();
                     RssLeagueThread.subscriberGuilds.remove(i);
                     return;
                 }
+                i++;
             }
 
             event.getChannel().sendMessage("Feed is currently not enabled for this channel").queue();

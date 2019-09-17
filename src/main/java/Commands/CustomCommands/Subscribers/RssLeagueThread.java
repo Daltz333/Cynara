@@ -55,6 +55,8 @@ public class RssLeagueThread implements Runnable {
                 subscriberGuilds.add(new Pair(guildId, rssChannel));
             }
 
+            connection.close();
+
         } catch (SQLException e) {
             logger.error("Unable to establish SQL connection for RssThread!", e);
         }
