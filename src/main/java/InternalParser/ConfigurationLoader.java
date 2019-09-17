@@ -32,7 +32,6 @@ public class ConfigurationLoader {
 
     public static String getCurrentDir() {
         try {
-            logger.info("Using directory: " +  new File(ConfigurationLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath());
             return new File(ConfigurationLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
         } catch (URISyntaxException e) {
             logger.error("Exception: ", e);

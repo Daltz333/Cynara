@@ -140,20 +140,12 @@ public class Main {
                 jda = new JDABuilder(AccountType.BOT).setToken(botToken).build();
 
                 if (!dbLess) {
+                    String query = "";
                     try {
-                        jda.awaitReady();
-                    } catch (InterruptedException e) {
-                        logger.error("JDA await interrupted??? Why??", e);
-                    }
-                    for (Guild guild : jda.getGuilds()) {
-                        String query = "";
-                        try {
-                            logger.info("Processing " + guild.getName());
-                            query = "IF NOT EXISTS(SELECT * FROM " + guild.getId() + ") CREATE TABLE " + guild.getId() + "(Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, PRIMARY KEY(Guild_ID)";
-                            connection.createStatement().execute(query);
-                        } catch (SQLException ex) {
-                            logger.error("Error creating statement for guild " + guild.getId() + "\n" + query);
-                        }
+                        query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Bot_Prefix char(255), PRIMARY KEY(Guild_ID))";
+                        connection.createStatement().execute(query);
+                    } catch (SQLException ex) {
+                        logger.error("Error creating statement for guild ", ex);
                     }
                 }
 
