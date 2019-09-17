@@ -4,12 +4,16 @@ import Commands.CustomCommands.Subscribers.RssLeagueThread;
 import Constants.Configuration;
 import Utils.Pair;
 import com.apptastic.rssreader.RssReader;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class LeagueNewsCommand extends ListenerAdapter {
@@ -27,53 +31,49 @@ public class LeagueNewsCommand extends ListenerAdapter {
             return;
         }
 
-        if (event.getMember().hasPermission(Permission.MANAGE_CHANNEL) || event.getMember().getId().equals(Configuration.kOwnerId)) {
-            //enable rss-feed for this channels
-            if (event.getMessage().getContentDisplay().contains(Configuration.kBotPrefix + "rssenable")){
-                if (containsId(event.getChannel().getId())) {
-                    event.getChannel().sendMessage("This bot is already configured to this channel!").queue();
-                } else {
-                    RssLeagueThread runnable = new RssLeagueThread(event);
-                    Thread t = new Thread(runnable);
-                    channels.add(new Pair(event.getChannel().getId(), runnable));
-                    t.setDaemon(true);
-                    t.start();
-
-                    event.getChannel().sendMessage("League Feed has been enabled for " + event.getChannel().getName()).queue();
-                }
-            } else if (event.getMessage().getContentDisplay().contains(Configuration.kBotPrefix + "rssdisable")) {
-                if (containsId(event.getChannel().getId())) {
-                    boolean found = false;
-                    for (Pair pair : channels) {
-                        if (pair.getKey().toString().equalsIgnoreCase(event.getChannel().getId())) {
-                            found = true;
-                            RssLeagueThread t = (RssLeagueThread) pair.getValue();
-                            t.requestStop();
-                            channels.remove(pair);
-                            event.getChannel().sendMessage("Disabled for channel " + event.getChannel().getName()).queue();
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        event.getChannel().sendMessage("Unable to disable feed? Perhaps it was never enabled?").queue();
-                        logger.warn("WARNING! ATTEMPTING TO DISABLE COMMAND NOT IN QUEUE! CHECK THREADS!");
-                    }
-
-                } else {
-                    logger.warn("WARNING! ATTEMPTING TO DISABLE COMMAND NOT IN QUEUE! CHECK THREADS!");
+        Pair guild = new Pair(event.getGuild().getId(), event.getChannel().getId());
+        if (event.getMessage().getContentDisplay().startsWith(Configuration.kBotPrefix + "rssenable")) {
+            boolean found = false;
+            for (Pair guilds : RssLeagueThread.subscriberGuilds) {
+                String guildData = (String)guilds.getKey();
+                if (guildData.equals(event.getGuild().getId())) {
+                    found = true;
                 }
             }
-        }
-    }
 
-    private boolean containsId(String id) {
-        for (Pair pair : channels) {
-            if (pair.getKey().toString().equalsIgnoreCase(id)) {
-                return true;
+            if (!found) {
+                RssLeagueThread.subscriberGuilds.add(guild);
+                try {
+                String query = "INSERT INTO MAIN_GUILD_DATA (Guild_ID, Member_Id, Member_Name, Member_Xp, Riot_Rss_Enable, Riot_Rss_Channel, Bot_Prefix) VALUES (" + event.getGuild().getId() + ", NULL, NULL, NULL, 1," + event.getTextChannel().getId() + ", NULL)";
+                    Connection connection = DriverManager.getConnection(Configuration.kDatabaseUrl);
+                    connection.createStatement().execute(query);
+
+                } catch (SQLException e) {
+                    logger.error("Unable to add RSS subscriber to database", e);
+                }
+
+                event.getChannel().sendMessage("Successfully subscribed channel to feed!").queue();
+            } else {
+                event.getChannel().sendMessage("Channel is already configured for this feed!").queue();
             }
+
+        } else if (event.getMessage().getContentDisplay().startsWith(Configuration.kBotPrefix + "rssdisable")) {
+            int i = 0;
+            for (Pair guilds : RssLeagueThread.subscriberGuilds) {
+                i++;
+                String guildData = (String)guilds.getKey();
+                if (guildData.equals(event.getGuild().getId())) {
+                    event.getChannel().sendMessage("Guild found, successfully removed!").queue();
+                    RssLeagueThread.subscriberGuilds.remove(i);
+                    return;
+                }
+            }
+
+            event.getChannel().sendMessage("Feed is currently not enabled for this channel").queue();
+
+        } else {
+            //ignore, not our command
         }
 
-        return false;
     }
 }

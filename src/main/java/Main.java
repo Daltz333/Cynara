@@ -1,6 +1,7 @@
 import Commands.CustomCommands.BotHelpCommand;
 import Commands.CustomCommands.DadBotCustomCommand;
 import Commands.CustomCommands.LeagueNewsCommand;
+import Commands.CustomCommands.Subscribers.RssLeagueThread;
 import Commands.LeagueCommands.ChampInfoCommand;
 import Commands.LeagueCommands.CurrentRotationCommand;
 import Commands.LeagueCommands.LeagueSpectatorCommand;
@@ -142,12 +143,24 @@ public class Main {
                 if (!dbLess) {
                     String query = "";
                     try {
-                        query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Bot_Prefix char(255), PRIMARY KEY(Guild_ID))";
+                        query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, Bot_Prefix char(255), PRIMARY KEY(Guild_ID))";
                         connection.createStatement().execute(query);
                     } catch (SQLException ex) {
                         logger.error("Error creating statement for guild ", ex);
                     }
                 }
+
+                try {
+                    jda.awaitReady();
+                } catch (InterruptedException e) {
+                    logger.error("How the fuck did the JDA await get interrupted???");
+                }
+
+                //load our subscribers
+                Runnable rssRunnable = new RssLeagueThread(jda);
+                Thread rssThread = new Thread(rssRunnable);
+                rssThread.setDaemon(true);
+                rssThread.start();
 
                 //loader our client and custom commands
                 jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
