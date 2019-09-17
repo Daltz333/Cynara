@@ -18,12 +18,6 @@ public class SetPrefixCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if(!ConfigurationLoader.doesCollectionExist(event.getGuild().getId())) {
-            ConfigurationLoader.getDatabase().createCollection(event.getGuild().getId());
-        }
-
-        List<Pair> data = ConfigurationLoader.getDatabase().getCollection(Pair.class);
-
 
     }
 }
