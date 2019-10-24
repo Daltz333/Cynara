@@ -57,9 +57,16 @@ public class PurgeCommand extends Command {
             return;
         }
 
-        event.getTextChannel().deleteMessages(result).queue();
-
-        event.reply("Deleting " + numMessages + " messages.");
-
+        try {
+            event.getTextChannel().deleteMessages(result).queue();
+        } catch (IllegalArgumentException e) {
+            //check if fail because message older than 2 weeks
+            if (e.getMessage().contains("2 weeks")) {
+                for (Message message : result) {
+                    message.delete().queue();
+                    logger.info("");
+                }
+            }
+        }
     }
 }
