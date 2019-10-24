@@ -42,26 +42,28 @@ public class LeagueNewsCommand extends ListenerAdapter {
 
             if (!found) {
                 RssLeagueThread.subscriberGuilds.add(guild);
+                String query = "";
+                String doesExist = "";
+                String updateDb = "";
+
                 try {
-                    String doesExist = "SELECT * FROM MAIN_GUILD_DATA WHERE Guild_ID=" + event.getGuild().getId();
-                    String query = "INSERT INTO MAIN_GUILD_DATA (Guild_ID, Member_Id, Member_Name, Member_Xp, Riot_Rss_Enable, Riot_Rss_Channel, Bot_Prefix) VALUES (" + event.getGuild().getId() + ", NULL, NULL, NULL, 1," + event.getTextChannel().getId() + ", NULL) WHERE NOT EXISTS(SELECT * FROM MAIN_GUILD_DATA WHERE Guild_ID= " + event.getGuild().getId() + ")";
-                    String updateDb = "UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=1, Riot_Rss_Channel=" + event.getTextChannel().getId() + " WHERE Guild_ID=" + event.getGuild().getId();
+                    doesExist = "SELECT * FROM MAIN_GUILD_DATA WHERE Guild_ID=" + event.getGuild().getId();
+                    query = "INSERT INTO MAIN_GUILD_DATA (Guild_ID, Member_Id, Member_Name, Member_Xp, Riot_Rss_Enable, Riot_Rss_Channel, Bot_Prefix) VALUES (" + event.getGuild().getId() + ", NULL, NULL, NULL, 1," + event.getTextChannel().getId() + ", NULL)";
+                    updateDb = "UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=1, Riot_Rss_Channel=" + event.getTextChannel().getId() + " WHERE Guild_ID=" + event.getGuild().getId();
+
                     Connection connection = DriverManager.getConnection(Configuration.kDatabaseUrl);
                     logger.info("Using query \n" + query);
                     ResultSet data = connection.createStatement().executeQuery(doesExist);
 
-                    boolean update = false;
                     if (data.next()) {
-                        update = true;
-                    }
-
-                    if (update) {
                         connection.createStatement().execute(updateDb);
                     } else {
                         connection.createStatement().execute(query);
                     }
                     connection.close();
+
                 } catch (SQLException e) {
+                    logger.error("SQL Failure: " + query);
                     logger.error("Unable to add RSS subscriber to database", e);
                 }
 

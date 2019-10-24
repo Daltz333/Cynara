@@ -145,7 +145,7 @@ public class Main {
                 if (!dbLess) {
                     String query = "";
                     try {
-                        query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, Bot_Prefix char(255), PRIMARY KEY(Guild_ID))";
+                        query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, Bot_Prefix char(255), Riot_Rss_Last_Message char(255), PRIMARY KEY(Guild_ID))";
                         connection.createStatement().execute(query);
                         connection.close();
                     } catch (SQLException ex) {
@@ -160,15 +160,15 @@ public class Main {
                 }
 
                 //load our subscribers
-                Runnable rssRunnable = new RssLeagueThread(jda);
-                Thread rssThread = new Thread(rssRunnable);
-                rssThread.setDaemon(true);
-                rssThread.start();
+                Timer timer = new Timer();
+                RssLeagueThread thread = new RssLeagueThread(jda);
+
+                //schedule every 5 minutes
+                timer.schedule(thread, 0, 300000);
 
                 //loader our client and custom commands
                 jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
                 StatusUpdater updaterTask = new StatusUpdater(jda);
-                Timer timer = new Timer();
 
                 //set the current activity every 1 hour
                 timer.schedule(updaterTask, 0, 3600000);

@@ -6,9 +6,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import oshi.SystemInfo;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-
 public class SpecsCommand extends Command {
     private SystemInfo info = new SystemInfo();
 
@@ -22,7 +19,6 @@ public class SpecsCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println("running");
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(Configuration.kEmbedColor);
         eb.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
