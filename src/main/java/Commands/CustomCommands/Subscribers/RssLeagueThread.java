@@ -4,6 +4,7 @@ import Constants.Configuration;
 import Utils.Pair;
 import com.apptastic.rssreader.Item;
 import com.apptastic.rssreader.RssReader;
+import com.sun.tools.javac.jvm.Items;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -72,52 +73,47 @@ public class RssLeagueThread implements Runnable {
                     items = (ArrayList<Item>) stream.collect(Collectors.toList());
                     int i = 0;
 
-                    for (Item item : items) {
-                        if (!item.getTitle().isPresent() || !item.getDescription().isPresent()) {
+                    Item item = items.get(0);
+
+                    if (!item.getTitle().isPresent() || !item.getDescription().isPresent()) {
+                        continue;
+                    }
+
+                    i++;
+
+                    if (!lastKnownTitle.equalsIgnoreCase(item.getTitle().get())) {
+                        lastKnownTitle = item.getTitle().get();
+
+                        Document soup = Jsoup.parse(item.getDescription().get());
+
+                        Element image = soup.select("img").first();
+
+                        if (image == null || image.text() == null) {
+                            logger.warn("No image in document?\n" + item.getDescription().get());
                             continue;
                         }
 
-                        //only grab the first one
-                        if (i != 0) {
-                            break;
-                        }
+                        String imageUrl = "https://na.leagueoflegends.com/" + image.attr("src");
 
-                        i++;
+                        logger.info("Using Image URL: " + imageUrl);
 
-                        if (!lastKnownTitle.equalsIgnoreCase(item.getTitle().get())) {
-                            lastKnownTitle = item.getTitle().get();
+                        builder.setTitle(lastKnownTitle);
+                        builder.setImage(imageUrl);
 
-                            Document soup = Jsoup.parse(item.getDescription().get());
-
-                            Element image = soup.select("img").first();
-
-                            if (image == null || image.text() == null) {
-                                logger.warn("No image in document?\n" + item.getDescription().get());
-                                continue;
-                            }
-
-                            String imageUrl = "https://na.leagueoflegends.com/" + image.attr("src");
-
-                            logger.info("Using Image URL: " + imageUrl);
-
-                            builder.setTitle(lastKnownTitle);
-                            builder.setImage(imageUrl);
-
-                            for (Guild guild : jda.getGuilds()) {
-                                for (Pair guilds : subscriberGuilds) {
-                                    String guildData = (String)guilds.getKey();
-                                    logger.info("Comparing " + guild.getId() + "vs" + guildData);
-                                    if (guildData.equalsIgnoreCase(guild.getId())) {
-                                        logger.info("Publishing feed for guild " + guild.getId());
-                                        Objects.requireNonNull(guild.getTextChannelById((String) guilds.getValue())).sendMessage(builder.build()).queue();
-                                    }
+                        for (Guild guild : jda.getGuilds()) {
+                            for (Pair guilds : subscriberGuilds) {
+                                String guildData = (String)guilds.getKey();
+                                logger.info("Comparing " + guild.getId() + "vs" + guildData);
+                                if (guildData.equalsIgnoreCase(guild.getId())) {
+                                    logger.info("Publishing feed for guild " + guild.getId());
+                                    Objects.requireNonNull(guild.getTextChannelById((String) guilds.getValue())).sendMessage(builder.build()).queue();
                                 }
                             }
-
-                            break;
-                        } else {
-                            //do nothing, rss is not in list
                         }
+
+                        break;
+                    } else {
+                        //do nothing, rss is not in list
                     }
 
                 } catch (IOException e) {

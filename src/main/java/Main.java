@@ -14,6 +14,7 @@ import Commands.SysAdminCommands.MoveMusicChannelCommand;
 import Commands.SysAdminCommands.PurgeCommand;
 import Commands.SysAdminCommands.SpecsCommand;
 import Constants.Configuration;
+import Handlers.StatusUpdater;
 import InternalParser.ConfigurationLoader;
 import InternalParser.JsonLoader;
 import InternalParser.JsonLol.DataType;
@@ -43,6 +44,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Scanner;
+import java.util.Timer;
 
 public class Main {
     private static Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
@@ -165,6 +167,12 @@ public class Main {
 
                 //loader our client and custom commands
                 jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
+                StatusUpdater updaterTask = new StatusUpdater(jda);
+                Timer timer = new Timer();
+
+                //set the current activity every 1 hour
+                timer.schedule(updaterTask, 0, 3600000);
+
             } catch (LoginException e) {
                 logger.error("Exception: ", e);
             }

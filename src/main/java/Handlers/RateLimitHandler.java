@@ -6,14 +6,12 @@ public class RateLimitHandler {
     private static long  systemTime = -1;
     private static int rateLimit = -1;
 
-
     public static void setRateLimit(int timeoutInSeconds) {
         systemTime = System.currentTimeMillis();
         rateLimit = timeoutInSeconds;
     }
 
     public static boolean isRateLimited() {
-
         if (systemTime == -1 || rateLimit == -1) {
             isRatedLimited = false;
         } else {
