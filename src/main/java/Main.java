@@ -46,11 +46,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main {
     private static Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
 
     private static JDA jda;
+
+    private static Timer timer = new Timer();
 
     public static void main(String[] args) {
         try {
@@ -170,8 +173,10 @@ public class Main {
 
                 //loader our client and custom commands
                 jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
-                StatusUpdater updaterTask = new StatusUpdater(jda);
+                TimerTask updaterTask = new StatusUpdater(jda);
 
+                timer.schedule(updaterTask, 0, 3600000);
+                
             } catch (LoginException e) {
                 logger.error("Exception: ", e);
             }
