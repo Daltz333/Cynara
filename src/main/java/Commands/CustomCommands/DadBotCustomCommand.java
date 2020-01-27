@@ -17,7 +17,7 @@ public class DadBotCustomCommand extends ListenerAdapter {
         if (message.contains("i am ")) {
             int beginLocation = message.indexOf("i am");
 
-            if (beginLocation == -1) {
+            if (beginLocation != 0) {
                 return;
             } else {
                 beginLocation = beginLocation + 5;
@@ -29,7 +29,7 @@ public class DadBotCustomCommand extends ListenerAdapter {
         } else if (message.contains("i'm ")) {
             int beginLocation = message.indexOf("i'm");
 
-            if (beginLocation == -1) {
+            if (beginLocation != 0) {
                 return;
             } else {
                 beginLocation = beginLocation + 4;
@@ -41,7 +41,7 @@ public class DadBotCustomCommand extends ListenerAdapter {
         } else if (message.contains("im ")) {
             int beginLocation = message.indexOf("im");
 
-            if (beginLocation == -1) {
+            if (beginLocation != 0) {
                 return;
             } else {
                 beginLocation = beginLocation + 3;
