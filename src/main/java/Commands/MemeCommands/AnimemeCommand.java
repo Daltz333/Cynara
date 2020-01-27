@@ -35,6 +35,11 @@ public class AnimemeCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        if (client == null) {
+            event.reply("Reddit client credentials have not been configured properly!");
+            return;
+        }
+
         SubredditReference reference = client.subreddit("Animemes");
         DefaultPaginator<Submission> posts = reference.posts().limit(5).build();
 

@@ -24,8 +24,12 @@ public class SpecsCommand extends Command {
         eb.setFooter(Configuration.kEmbedFooterText, Configuration.kEmbedFooterUrl);
         StringBuilder currentCpuLoad = new StringBuilder();
 
-        eb.addField("Operating System", info.getOperatingSystem().getFamily(), false);
-        eb.addField("CPU", info.getHardware().getProcessor().getName() + " " + info.getHardware().getProcessor().getMaxFreq()/1000000000 + "GHz", false);
+        eb.addField("Operating System",
+                info.getOperatingSystem().getFamily() + " "
+                        + info.getOperatingSystem().getVersionInfo().getVersion() + " "
+                        + info.getOperatingSystem().getVersionInfo().getBuildNumber()
+                , false);
+        eb.addField("CPU", info.getHardware().getProcessor().getProcessorIdentifier().getName(), false);
 
         double speed = 0;
         for (long cpuLoad : info.getHardware().getProcessor().getCurrentFreq()) {
@@ -33,9 +37,8 @@ public class SpecsCommand extends Command {
         }
 
         speed = (speed / info.getHardware().getProcessor().getCurrentFreq().length) / 1000000000;
-        double maxSpeed = info.getHardware().getProcessor().getMaxFreq() / 1000000000;
 
-        eb.addField("CPU Speed", speed + "GHz/" + maxSpeed + "GHz", false);
+        eb.addField("CPU Speed", speed + "GHz", false);
         eb.addField("Total Memory", info.getHardware().getMemory().getAvailable()/1000000000 + "GB/" + info.getHardware().getMemory().getTotal()/1000000000 + "GB", false);
 
         event.reply(eb.build());

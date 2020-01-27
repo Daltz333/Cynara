@@ -1,7 +1,6 @@
 import Commands.CustomCommands.BotHelpCommand;
 import Commands.CustomCommands.DadBotCustomCommand;
 import Commands.CustomCommands.LeagueNewsCommand;
-import Commands.CustomCommands.Subscribers.RssLeagueThread;
 import Commands.LeagueCommands.ChampInfoCommand;
 import Commands.LeagueCommands.CurrentRotationCommand;
 import Commands.LeagueCommands.LeagueSpectatorCommand;
@@ -22,6 +21,7 @@ import Music.MusicManager;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dean.jraw.RedditClient;
+import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.OkHttpNetworkAdapter;
 import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.oauth.Credentials;
@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.rithms.riot.api.ApiConfig;
 import net.rithms.riot.api.RiotApi;
+import org.apache.http.ProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -106,7 +107,15 @@ public class Main {
 
             Credentials credentials = Credentials.script(redditUsername, redditPassword, redditId, redditSecret);
             UserAgent userAgent = new UserAgent("bot", "daltz.bot.cynara", "1.0.0", "Cynara");
-            RedditClient reddit = OAuthHelper.automatic(new OkHttpNetworkAdapter(userAgent), credentials);
+
+            RedditClient reddit = null;
+            //regen
+
+            try {
+                reddit = OAuthHelper.automatic(new OkHttpNetworkAdapter(userAgent), credentials);
+            } catch (NetworkException e) {
+                logger.error("Failed to authenticate REDDIT API! Associated commands will not work!", e);
+            }
 
             CommandClientBuilder builder = new CommandClientBuilder();
             ApiConfig config = new ApiConfig().setKey(riotToken);
@@ -159,19 +168,9 @@ public class Main {
                     logger.error("How the fuck did the JDA await get interrupted???");
                 }
 
-                //load our subscribers
-                Timer timer = new Timer();
-                RssLeagueThread thread = new RssLeagueThread(jda);
-
-                //schedule every 5 minutes
-                timer.schedule(thread, 0, 300000);
-
                 //loader our client and custom commands
                 jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
                 StatusUpdater updaterTask = new StatusUpdater(jda);
-
-                //set the current activity every 1 hour
-                timer.schedule(updaterTask, 0, 3600000);
 
             } catch (LoginException e) {
                 logger.error("Exception: ", e);
