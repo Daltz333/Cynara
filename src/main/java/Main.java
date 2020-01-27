@@ -1,6 +1,8 @@
 import Commands.CustomCommands.BotHelpCommand;
 import Commands.CustomCommands.DadBotCustomCommand;
 import Commands.CustomCommands.LeagueNewsCommand;
+import Commands.CustomCommands.Subscribers.RiotGuild;
+import Commands.CustomCommands.Subscribers.RiotNewsScheduler;
 import Commands.LeagueCommands.ChampInfoCommand;
 import Commands.LeagueCommands.CurrentRotationCommand;
 import Commands.LeagueCommands.LeagueSpectatorCommand;
@@ -33,7 +35,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.rithms.riot.api.ApiConfig;
 import net.rithms.riot.api.RiotApi;
-import org.apache.http.ProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ import javax.security.auth.login.LoginException;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.Timer;
@@ -60,8 +62,8 @@ public class Main {
             JsonLoader jsonLoader = new JsonLoader();
 
             //load champion static information
-            jsonLoader.loadJson(Main.class.getClassLoader().getResourceAsStream("DDragon/champion.json"), DataType.CHAMPIONS);
-            jsonLoader.loadJson(Main.class.getClassLoader().getResourceAsStream("DDragon/runesReforged.json"), DataType.RUNES);
+            jsonLoader.loadJson(DataType.CHAMPIONS);
+            jsonLoader.loadJson(DataType.RUNES);
 
             try {
                 ConfigurationLoader.copyTemplateJSON();
@@ -155,10 +157,21 @@ public class Main {
                 jda = new JDABuilder(AccountType.BOT).setToken(botToken).build();
 
                 if (!dbLess) {
-                    String query = "";
                     try {
-                        query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, Bot_Prefix char(255), Riot_Rss_Last_Message char(255), PRIMARY KEY(Guild_ID))";
+                        String query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, Bot_Prefix char(255), Riot_Rss_Last_Message char(255), PRIMARY KEY(Guild_ID))";
+                        String queryGuilds = "SELECT * FROM MAIN_GUILD_DATA WHERE Riot_Rss_Enable = 1";
                         connection.createStatement().execute(query);
+                        ResultSet sqlData = connection.createStatement().executeQuery(queryGuilds);
+
+                        while (sqlData.next()) {
+                            String guildId = String.valueOf(sqlData.getLong("Guild_ID"));
+                            String rssChannel = String.valueOf(sqlData.getLong("Riot_Rss_Channel"));
+                            String lastMessage = sqlData.getString("Riot_Rss_Last_Message");
+                            boolean enabled = sqlData.getInt("Riot_Rss_Enable") == 1;
+
+                            RiotNewsScheduler.riotGuilds.add(new RiotGuild(guildId, rssChannel, enabled, lastMessage));
+                        }
+
                         connection.close();
                     } catch (SQLException ex) {
                         logger.error("Error creating statement for guild ", ex);
@@ -174,9 +187,11 @@ public class Main {
                 //loader our client and custom commands
                 jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
                 TimerTask updaterTask = new StatusUpdater(jda);
+                TimerTask newsTask = new RiotNewsScheduler(jda);
 
                 timer.schedule(updaterTask, 0, 3600000);
-                
+                timer.schedule(newsTask, 0, 600000);
+
             } catch (LoginException e) {
                 logger.error("Exception: ", e);
             }

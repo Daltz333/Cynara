@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class TrackScheduler extends AudioEventAdapter {
     private AudioPlayer player;
@@ -54,17 +55,18 @@ public class TrackScheduler extends AudioEventAdapter {
         isPlaying = false;
 
         if (endReason.mayStartNext) {
-            nextTrack();
+            //only start if queue is empty
+            if(!queue.isEmpty()) {
+                nextTrack();
+            }
         } else if (endReason == AudioTrackEndReason.FINISHED) {
             // Track finished
         } else {
             //confusion??
         }
 
-        try {
-            queue.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(!queue.isEmpty()) {
+            queue.remove();
         }
 
         // endReason == FINISHED: A track finished or died by an exception (mayStartNext = true).
@@ -84,12 +86,22 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         // Audio track has been unable to provide us any audio, might want to just start a new track
+        try {
+            player.startTrack(queue.poll(100, TimeUnit.MILLISECONDS), false);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void nextTrack() {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
-        player.startTrack(queue.poll(), false);
+        try {
+            AudioTrack track = queue.poll(100, TimeUnit.MILLISECONDS);
+            player.startTrack(track, false);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public ArrayList<AudioTrack> getQueue() {
@@ -104,9 +116,11 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void clearQueue() {
-        for (int i = 0; i < queue.remainingCapacity(); i++) {
+        for (int i = 0; i < queue.size(); i++) {
             queue.remove();
         }
+
+        isPlaying = false;
     }
 
     public boolean isPlaying() {

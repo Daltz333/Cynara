@@ -3,12 +3,17 @@ package InternalParser;
 import Constants.Configuration;
 import InternalParser.JsonLol.*;
 import com.google.gson.JsonArray;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -20,20 +25,21 @@ public class JsonLoader {
 
     private static Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
 
-    public void loadJson(InputStream url, DataType type) {
+    public void loadJson(DataType type) {
         logger.info("Parsing Champion Information");
 
-        champions.clear();
+        String currentVersion = getLatestChampVersion();
 
-        Scanner scanner = new Scanner(url);
-        StringBuilder json = new StringBuilder();
-
-        while (scanner.hasNext()) {
-            json.append(scanner.next());
-        }
+        logger.info("Current RIOT version is " + currentVersion);
 
         if (type == DataType.CHAMPIONS) {
-            JSONObject jsonObject = new JSONObject(json.toString());
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(IOUtils.toString(new URL("https://ddragon.leagueoflegends.com/cdn/" + currentVersion + "/data/en_US/champion.json"), StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                logger.error("Unable to read from URL", e);
+                return;
+            }
 
             //load champion json data
             JSONObject champData = jsonObject.getJSONObject("data");
@@ -61,7 +67,13 @@ public class JsonLoader {
             //TODO
 
         } else if (type == DataType.RUNES) {
-            JSONArray jsonDataArray = new JSONArray(json.toString());
+            JSONArray jsonDataArray = null;
+            try {
+                jsonDataArray = new JSONArray(IOUtils.toString(new URL("https://ddragon.leagueoflegends.com/cdn/" + currentVersion + "/data/en_US/runesReforged.json"), StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                logger.error("Unable to read from URL!", e);
+                return;
+            }
 
             for (int i = 0; i < jsonDataArray.length(); i++) {
                 JSONObject primaryData = jsonDataArray.getJSONObject(i);
@@ -94,5 +106,17 @@ public class JsonLoader {
                 runesPrimary.add(new JsonRunePrimary(primaryName, primaryKey, primaryId));
             }
         }
+    }
+
+    private String getLatestChampVersion() {
+        JSONArray jsonObject;
+        try {
+            jsonObject = new JSONArray(IOUtils.toString(new URL("https://ddragon.leagueoflegends.com/api/versions.json"), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.error("Unable to get latest champ version!");
+            return "10.2.1";
+        }
+
+        return jsonObject.getString(0);
     }
 }

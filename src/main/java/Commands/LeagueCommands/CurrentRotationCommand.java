@@ -62,6 +62,7 @@ public class CurrentRotationCommand extends Command {
 
             String champNames = "";
 
+            logger.info("Retrieved Random Champ IDS: " + champIds.toString());
             for (Integer champ : champIds) {
                 String champName = "";
 
@@ -72,7 +73,7 @@ public class CurrentRotationCommand extends Command {
                     }
                 }
 
-                champNames = champNames + champName + " ";
+                champNames = champNames + champName + " \n";
             }
 
             eb.addField("Champions", champNames, false);

@@ -58,14 +58,14 @@ public class MusicManager {
         playerManager.loadItem(id, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                trackScheduler.queue(track, event);
-
                 //only play if we're not currently playing anything
                 if (!trackScheduler.isPlaying) {
                     play(event);
                 } else {
                     event.reply(track.getInfo().title + " has been added to the queue!");
                 }
+
+                trackScheduler.queue(track, event);
             }
 
             @Override
@@ -76,14 +76,14 @@ public class MusicManager {
                     firstTrack = playlist.getTracks().get(0);
                 }
 
-                for (AudioTrack track : playlist.getTracks()) {
-                    trackScheduler.queue(track, event);
-                }
-
                 if (!trackScheduler.isPlaying) {
                     play(event);
                 } else {
                     event.reply(playlist.getName() + " has been added to the queue!");
+                }
+
+                for (AudioTrack track : playlist.getTracks()) {
+                    trackScheduler.queue(track, event);
                 }
             }
 
@@ -100,7 +100,12 @@ public class MusicManager {
     }
 
     public void skipTrack(CommandEvent event) {
-        trackScheduler.nextTrack();
+        if (trackScheduler.getQueue().isEmpty()) {
+            event.reply("There is no songs in the queue!");
+            event.getGuild().getAudioManager().closeAudioConnection();
+        } else {
+            trackScheduler.nextTrack();
+        }
     }
 
     public void stop(CommandEvent event) {

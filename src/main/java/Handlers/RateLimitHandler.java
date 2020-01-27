@@ -15,11 +15,7 @@ public class RateLimitHandler {
         if (systemTime == -1 || rateLimit == -1) {
             isRatedLimited = false;
         } else {
-            if (systemTime + rateLimit*1000 < System.currentTimeMillis()) {
-                isRatedLimited = false;
-            } else {
-                isRatedLimited = true;
-            }
+            isRatedLimited = systemTime + rateLimit * 1000 >= System.currentTimeMillis();
         }
 
         return isRatedLimited;
