@@ -1,4 +1,4 @@
-# Riot-Sama
+# Cynara
 
 General Purpose League of Legends Discord Bot. Note that this bot is very much, in-progress :smiley:
 
