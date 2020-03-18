@@ -17,10 +17,19 @@ public class EggCommand extends Command {
     }
     @Override
     protected void execute(CommandEvent event) {
-        List<Message> messages = event.getTextChannel().getHistory().retrievePast(50).complete();
+        Runnable thread = new Runnable() {
+            @Override
+            public void run() {
+                List<Message> messages = event.getTextChannel().getHistory().retrievePast(50).complete();
 
-        for (Message message : messages) {
-            message.addReaction("\uD83E\uDD5A").queue();
-        }
+                for (Message message : messages) {
+                    message.addReaction("\uD83E\uDD5A").queue();
+                }
+            }
+        };
+
+        Thread asyncTask = new Thread(thread);
+        asyncTask.setDaemon(true);
+        asyncTask.start();
     }
 }
