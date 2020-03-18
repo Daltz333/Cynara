@@ -8,6 +8,7 @@ import Commands.LeagueCommands.CurrentRotationCommand;
 import Commands.LeagueCommands.LeagueSpectatorCommand;
 import Commands.LeagueCommands.RandomChampCommand;
 import Commands.MemeCommands.AnimemeCommand;
+import Commands.MemeCommands.EggCommand;
 import Commands.MemeCommands.InsultCommand;
 import Commands.MusicCommands.*;
 import Commands.SysAdminCommands.*;
@@ -136,7 +137,7 @@ public class Main {
                     new StopCommand(manager), new SkipCommand(manager), new PlaylistCommand(manager),
                     new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api), new AnimemeCommand(reddit),
                     new PurgeCommand(), new InsultCommand(), new AddEmojiCommand(), new MoveMusicChannelCommand(),
-                    new LockdownCommand());
+                    new LockdownCommand(), new LockdownServerCommand(), new EggCommand());
 
             CommandClient client = builder.build();
 

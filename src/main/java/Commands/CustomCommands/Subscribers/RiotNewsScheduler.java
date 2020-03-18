@@ -37,7 +37,7 @@ public class RiotNewsScheduler extends TimerTask {
         logger.info("Running News Command!");
         JSONObject jsonObject;
         try {
-            jsonObject = new JSONObject(IOUtils.toString(new URL("https://lolstatic-a.akamaihd.net/frontpage/apps/prod/harbinger-l10-website/en-us/master/en-us/page-data/news/game-updates/page-data.json"), StandardCharsets.UTF_8));
+            jsonObject = new JSONObject(IOUtils.toString(new URL("https://lolstatic-a.akamaihd.net/frontpage/apps/prod/harbinger-l10-website/en-us/production/en-us/page-data/news/game-updates/page-data.json"), StandardCharsets.UTF_8));
         } catch (IOException e) {
             logger.error("Error retrieving JSON News!", e);
             return;
