@@ -13,6 +13,7 @@ import Commands.MemeCommands.InsultCommand;
 import Commands.MusicCommands.*;
 import Commands.SysAdminCommands.*;
 import Constants.Configuration;
+import CustomListeners.EmoteListener;
 import Handlers.StatusUpdater;
 import InternalParser.ConfigurationLoader;
 import InternalParser.JsonLoader;
@@ -137,7 +138,8 @@ public class Main {
                     new StopCommand(manager), new SkipCommand(manager), new PlaylistCommand(manager),
                     new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api), new AnimemeCommand(reddit),
                     new PurgeCommand(), new InsultCommand(), new AddEmojiCommand(), new MoveMusicChannelCommand(),
-                    new LockdownCommand(), new LockdownServerCommand(), new EggCommand());
+                    new LockdownCommand(), new LockdownServerCommand(), new EggCommand(), new AntiRaidCommand(),
+                    new AddRoleToAllCommand());
 
             CommandClient client = builder.build();
 
@@ -157,7 +159,11 @@ public class Main {
 
                 if (!dbLess) {
                     try {
-                        String query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, Bot_Prefix char(255), Riot_Rss_Last_Message char(255), PRIMARY KEY(Guild_ID))";
+                        String query = "CREATE TABLE IF NOT EXISTS MAIN_GUILD_DATA (Guild_ID int, Member_Id int, " +
+                                "Member_Name char(255), Member_Xp int, Riot_Rss_Enable int, Riot_Rss_Channel int, " +
+                                "Bot_Prefix char(255), Riot_Rss_Last_Message char(255), Riot_Anti_Raid_Message int, " +
+                                "Riot_Anti_Raid_Role int, Riot_Anti_Raid_Active int, PRIMARY KEY(Guild_ID))";
+
                         String queryGuilds = "SELECT * FROM MAIN_GUILD_DATA WHERE Riot_Rss_Enable = 1";
                         connection.createStatement().execute(query);
                         ResultSet sqlData = connection.createStatement().executeQuery(queryGuilds);
@@ -184,7 +190,7 @@ public class Main {
                 }
 
                 //loader our client and custom commands
-                jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand());
+                jda.addEventListener(client, new DadBotCustomCommand(), new BotHelpCommand(client), new LeagueNewsCommand(), new EmoteListener());
                 TimerTask updaterTask = new StatusUpdater(jda);
                 TimerTask newsTask = new RiotNewsScheduler(jda);
 

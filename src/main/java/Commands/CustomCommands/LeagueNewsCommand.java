@@ -65,6 +65,8 @@ public class LeagueNewsCommand extends ListenerAdapter {
                             //connection.createStatement().execute("UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=1, Riot_Rss_Channel=" + event.getTextChannel().getId() + ", Riot_Rss_Last_Message=\"" +  + "\" WHERE Guild_ID=" + event.getGuild().getId());
                         }
 
+                        connection.close();
+
                     } catch (SQLException e) {
                         logger.error("Error connecting to database", e);
                     }
@@ -84,6 +86,7 @@ public class LeagueNewsCommand extends ListenerAdapter {
                     try {
                         Connection connection = DriverManager.getConnection(Configuration.kDatabaseUrl);
                         connection.createStatement().execute("UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=0, Riot_Rss_Channel=" + event.getTextChannel().getId() + " WHERE Guild_ID=" + event.getGuild().getId());
+                        connection.close();
                     } catch (SQLException e) {
                         logger.error("Error connecting to database", e);
                     }

@@ -74,6 +74,7 @@ public class RiotNewsScheduler extends TimerTask {
                     try {
                         Connection connection = DriverManager.getConnection(Configuration.kDatabaseUrl);
                         connection.createStatement().execute("UPDATE MAIN_GUILD_DATA SET Riot_Rss_Last_Message=\"" + title + "\" WHERE Guild_ID=" + guild.getGuildId());
+                        connection.close();
                     } catch (SQLException e) {
                         logger.error("Error connecting to database", e);
                     }
