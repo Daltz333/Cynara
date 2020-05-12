@@ -24,4 +24,4 @@ jobs:
       condition: in(variables['Agent.JobStatus'], 'Succeeded', 'SucceededWithIssues', 'Failed')
       inputs:
         artifactName: 'cynara-staging'
-        PathToPublish: 'build/libs/Cynara.jar'
+        PathToPublish: 'build/libs/Cynara-1.0'
