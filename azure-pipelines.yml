@@ -20,8 +20,6 @@ jobs:
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish JAR'
-      # Try to publish even if the build step failed
-      condition: in(variables['Agent.JobStatus'], 'Succeeded', 'SucceededWithIssues', 'Failed')
       inputs:
         artifactName: 'cynara-staging'
         PathToPublish: 'build/libs/Cynara-1.0.jar'
