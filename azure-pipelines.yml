@@ -15,7 +15,7 @@ jobs:
     - script: sudo apt-get -y install openjdk-11-jdk
       displayName: 'Install Dependencies'
 
-    - script: gradlew shadowJar
+    - script: ./gradlew shadowJar
       displayName: 'Build JAR'
 
     - task: PublishBuildArtifacts@1
