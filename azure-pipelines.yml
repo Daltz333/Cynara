@@ -12,7 +12,7 @@ jobs:
     - script: sudo apt-get -y update
       displayName: 'Update System Packages'
 
-    - script: sudo apt-get -y openjdk-11-jdk
+    - script: sudo apt-get -y install openjdk-11-jdk
       displayName: 'Install Dependencies'
 
     - script: gradlew shadowJar
