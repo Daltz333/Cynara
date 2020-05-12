@@ -1,0 +1,27 @@
+pool:
+  vmImage: 'ubuntu-18.04'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+jobs:
+  - job: Build
+    steps:
+    - script: sudo apt-get -y update
+      displayName: 'Update System Packages'
+
+    - script: sudo apt-get -y openjdk-11-jdk
+      displayName: 'Install Dependencies'
+
+    - script: gradlew shadowJar
+      displayName: 'Build JAR'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish JAR'
+      # Try to publish even if the build step failed
+      condition: in(variables['Agent.JobStatus'], 'Succeeded', 'SucceededWithIssues', 'Failed')
+      inputs:
+        artifactName: 'cynara-staging'
+        PathToPublish: 'build/libs/Cynara.jar'
