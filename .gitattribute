@@ -1,0 +1,3 @@
+# Specify gradlew line endings for UN*X
+
+gradlew text eol=lf
