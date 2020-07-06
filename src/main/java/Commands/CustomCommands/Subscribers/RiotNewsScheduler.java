@@ -52,7 +52,13 @@ public class RiotNewsScheduler extends TimerTask {
 
             System.out.println(array.toString());
             String title = array.getString("title");
-            String url = "https://na.leagueoflegends.com/en-us/" + array.getJSONObject("link").getString("url");
+            boolean internal = array.getJSONObject("link").getBoolean("internal");
+            String rawURL = array.getJSONObject("link").getString("url");
+            String url = rawURL;
+            // verify if the url is internal or not
+            if (internal) {
+                url = "https://na.leagueoflegends.com/en-us/" + rawURL;
+            }
             String imageUrl = array.getString("imageUrl");
 
             if(guild.getLastShownTitle() == null) {
