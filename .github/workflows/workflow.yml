@@ -7,7 +7,7 @@ on:
     branches:
       - master
 jobs:
-  build-jar:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,4 +29,15 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           source: "build/libs/bot.jar"
-          target: "root"
+          target: ""
+          overwrite: true
+          strip_components: 2
+      - name: Restart Server
+        if: github.repository_owner == 'daltz333'
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: sudo reboot now
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
