@@ -20,13 +20,8 @@ jobs:
       - name: Build jar
         run: |
           ./gradlew shadowJar
-  deploy:
-    needs: build-jar
-    runs-on: ubuntu-latest
-    if: github.repository_owner	== 'daltz333'
-    steps:
-      - uses: actions/checkout@v2
       - name: Deploy to Server
+        if: github.repository_owner == 'daltz333'
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
