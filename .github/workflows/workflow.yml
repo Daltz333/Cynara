@@ -21,7 +21,7 @@ jobs:
         run: |
           ./gradlew shadowJar
       - name: Deploy to Server
-        if: github.event.pull_request.merged == true
+        if: github.ref == 'refs/heads/master' && github.repository == 'daltz333/Cynara'
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -33,7 +33,7 @@ jobs:
           overwrite: true
           strip_components: 2
       - name: Restart Server
-        if: github.event.pull_request.merged == true
+        if: github.ref == 'refs/heads/master' && github.repository == 'daltz333/Cynara'
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: sudo reboot now
