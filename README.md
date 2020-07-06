@@ -1,4 +1,4 @@
-![Build Status](https://dev.azure.com/daltzsmith/Cynara/_apis/build/status/Daltz333.Cynara?branchName=master)
+![Build and Deploy](https://github.com/Daltz333/Cynara/workflows/Build%20and%20Deploy/badge.svg)
 
 # Cynara
 
@@ -14,7 +14,7 @@ General Purpose League of Legends Discord Bot. Note that this bot is very much, 
 
 ## Building
 
-Cynara is built using ``gradle`` and ``Java 11``. Please run ``gradlew shadowJar`` to build the application. This will place a ``Cynara-1.0.jar`` in the ``build/libs/`` directory.
+Cynara is built using ``gradle`` and ``Java 11``. Please run ``gradlew shadowJar`` to build the application. This will place a jar in the ``build/libs/`` directory.
 
 ## Notice
 
