@@ -19,11 +19,11 @@ jobs:
           sudo apt-get install adoptopenjdk-11-hotspot
       - name: Build jar
         run: |
-          gradlew shadowJar
+          ./gradlew shadowJar
   deploy:
     needs: build-jar
     runs-on: ubuntu-latest
-    if: github.repository_owner	== 'wpilibsuite'
+    if: github.repository_owner	== 'daltz333'
     steps:
       - uses: actions/checkout@v2
       - name: Deploy to Server
