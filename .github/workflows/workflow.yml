@@ -26,10 +26,8 @@ jobs:
     if: github.repository_owner	== 'wpilibsuite'
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Deploy to Server
-      - uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
