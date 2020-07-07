@@ -63,7 +63,7 @@ public class LeagueNewsCommand extends ListenerAdapter {
                         if (!data.next()) {
                             connection.createStatement().execute("INSERT INTO MAIN_GUILD_DATA (Guild_ID, Member_Id, Member_Name, Member_Xp, Riot_Rss_Enable, Riot_Rss_Channel, Bot_Prefix) VALUES (" + event.getGuild().getId() + ", NULL, NULL, NULL, 1," + event.getTextChannel().getId() + ", NULL)");
                         } else {
-                            //connection.createStatement().execute("UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=1, Riot_Rss_Channel=" + event.getTextChannel().getId() + ", Riot_Rss_Last_Message=\"" +  + "\" WHERE Guild_ID=" + event.getGuild().getId());
+                            connection.createStatement().execute("UPDATE MAIN_GUILD_DATA SET Riot_Rss_Enable=1, Riot_Rss_Channel=" + event.getTextChannel().getId() + " WHERE Guild_ID=" + event.getGuild().getId());
                         }
                         connection.close();
                     } catch (SQLException e) {
