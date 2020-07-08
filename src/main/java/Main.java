@@ -3,10 +3,7 @@ import Commands.CustomCommands.DadBotCustomCommand;
 import Commands.CustomCommands.LeagueNewsCommand;
 import Commands.CustomCommands.Subscribers.RiotGuild;
 import Commands.CustomCommands.Subscribers.RiotNewsScheduler;
-import Commands.LeagueCommands.ChampInfoCommand;
-import Commands.LeagueCommands.CurrentRotationCommand;
-import Commands.LeagueCommands.LeagueSpectatorCommand;
-import Commands.LeagueCommands.RandomChampCommand;
+import Commands.LeagueCommands.*;
 import Commands.MemeCommands.AnimemeCommand;
 import Commands.MemeCommands.EggCommand;
 import Commands.MemeCommands.InsultCommand;
@@ -139,7 +136,7 @@ public class Main {
                     new SkipToTrackCommand(manager), new LeagueSpectatorCommand(api), new AnimemeCommand(reddit),
                     new PurgeCommand(), new InsultCommand(), new AddEmojiCommand(), new MoveMusicChannelCommand(),
                     new LockdownCommand(), new LockdownServerCommand(), new EggCommand(), new AntiRaidCommand(),
-                    new AddRoleToAllCommand());
+                    new AddRoleToAllCommand(), new LeagueTriviaCommand());
 
             CommandClient client = builder.build();
 
