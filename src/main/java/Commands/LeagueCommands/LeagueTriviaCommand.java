@@ -8,6 +8,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,21 +40,32 @@ public class LeagueTriviaCommand extends Command {
             return;
         }
 
-        String champName = championList.get(1 + (int)(Math.random() * ((championList.size() - 1) + 1)));
+        String champName = championList.get(1 + (int) (Math.random() * ((championList.size() - 1) + 1)));
+        champName = champName.replaceAll("[^a-zA-Z0-9]", "");
         JSONObject jsonObject;
         try {
-            jsonObject = new JSONObject(IOUtils.toString(new URL(StoryBaseURL + champName + "/index.json"), StandardCharsets.UTF_8));
+            jsonObject = new JSONObject(IOUtils.toString(new URL(StoryBaseURL + champName.toLowerCase() + "/index.json"), StandardCharsets.UTF_8));
         } catch (IOException e) {
             logger.error("Unable to read from URL", e);
+            event.reply("Error parsing for champion: " + champName.toLowerCase());
             return;
         }
 
         String champInfo = jsonObject.getJSONObject("champion").getJSONObject("biography").getString("full");
 
+        String plainText;
+        if (champInfo.length() < 2000) {
+            plainText = champInfo;
+        } else {
+            plainText = Jsoup.parse(champInfo).text().substring(0, 2000) + "...";
+        }
+
+        plainText = plainText.replaceAll(champName, "KAREN");
+
         EmbedBuilder builder = new EmbedBuilder();
         builder.setAuthor(event.getSelfMember().getNickname());
         builder.setTitle("Guess that Champion!");
-        builder.setDescription(champInfo);
+        builder.setDescription(plainText);
         event.reply(builder.build());
     }
 }
