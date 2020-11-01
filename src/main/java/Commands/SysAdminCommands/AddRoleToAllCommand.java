@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class AddRoleToAllCommand extends CommandExtension {
     private static Logger logger = LoggerFactory.getLogger(Configuration.kLoggerName);
 
@@ -36,8 +38,9 @@ public class AddRoleToAllCommand extends CommandExtension {
             return;
         }
 
-        event.getGuild().retrieveMembers().complete(null);
-        for (Member member: event.getGuild().getMembers()) {
+        event.reply("Grabbing member data, this can take some time!");
+        
+        for (Member member: event.getGuild().loadMembers().get()) {
             logger.info("Process member " + member.getNickname());
             event.getGuild().addRoleToMember(member, mainRole).queue();
         }
