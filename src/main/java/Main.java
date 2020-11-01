@@ -152,7 +152,7 @@ public class Main {
             }
 
             try {
-                jda = new JDABuilder(AccountType.BOT).setToken(botToken).build();
+                jda = JDABuilder.createDefault(botToken).build();
 
                 if (!dbLess) {
                     try {
