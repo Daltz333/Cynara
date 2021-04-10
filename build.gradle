@@ -13,10 +13,14 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url 'https://jitpack.io' }
+    maven {
+        url 'https://m2.dv8tion.net/releases'
+        name 'm2-dv8tion'
+    }
 }
 
 dependencies {
-    compile 'net.dv8tion:JDA:4.2.0_229'
+    compile 'net.dv8tion:JDA:4.2.0_249'
     compile 'com.jagrosh:jda-utilities:3.0.5'
     compile 'com.sedmelluq:lavaplayer:1.3.71'
     compile 'com.github.taycaldwell:riot-api-java:4.3.0'
